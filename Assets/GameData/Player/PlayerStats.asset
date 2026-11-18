@@ -16,4 +16,4 @@ MonoBehaviour:
   jumpForce: 8
   maxHealth: 3
   invulnerabilityDuration: 1
-  blinkInterval: 0.1
+  damageFlashDuration: 0.8

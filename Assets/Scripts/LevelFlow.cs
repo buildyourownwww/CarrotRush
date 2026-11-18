@@ -27,10 +27,26 @@ public class LevelFlow : MonoBehaviour
     private int carrotsCollected;
     private bool levelFinished;
 
+    
     void Start()
     {
-        LoadLevel(startingLevel);
+        // Read the level selected in the menu
+        int selectedLevel = LevelSelectMenu.SelectedLevelToLoad;
+
+        Debug.Log("LevelFlow received level: " + selectedLevel);
+
+        // Reset the selection for future scene loads
+        LevelSelectMenu.SelectedLevelToLoad = 0;
+
+        // If no level was selected, use the default
+        if (selectedLevel <= 0)
+        {
+            selectedLevel = startingLevel;
+        }
+
+        LoadLevel(selectedLevel);
     }
+
 
     void Update()
     {
@@ -88,7 +104,9 @@ public class LevelFlow : MonoBehaviour
 
         UpdateTimerUI();
 
-        Debug.Log("Loaded level: " + currentLevel.levelName);
+        Debug.Log(
+            "Loaded level: " + currentLevel.levelName
+        );
 
         // Spawn enemies from LevelData
         if (currentLevel.enemies == null)
@@ -108,15 +126,21 @@ public class LevelFlow : MonoBehaviour
 
             spawnedEnemies.Add(enemy);
 
-            Charger charger = enemy.GetComponent<Charger>();
+            Charger charger =
+                enemy.GetComponent<Charger>();
+
             if (charger != null)
                 charger.SetPlayer(player);
 
-            Patroller patroller = enemy.GetComponent<Patroller>();
+            Patroller patroller =
+                enemy.GetComponent<Patroller>();
+
             if (patroller != null)
                 patroller.SetPlayer(player);
 
-            Shooter shooter = enemy.GetComponent<Shooter>();
+            Shooter shooter =
+                enemy.GetComponent<Shooter>();
+
             if (shooter != null)
                 shooter.SetPlayer(player);
         }
@@ -163,6 +187,9 @@ public class LevelFlow : MonoBehaviour
 
             if (resultText != null)
                 resultText.text = "LEVEL COMPLETE!";
+
+            // Save completed level progress
+            SaveLevelProgress();
         }
         else
         {
@@ -174,6 +201,53 @@ public class LevelFlow : MonoBehaviour
 
         // Pause gameplay
         Time.timeScale = 0f;
+    }
+
+    void SaveLevelProgress()
+    {
+        if (SaveManager.Instance == null ||
+            SaveManager.Instance.Data == null)
+        {
+            Debug.LogWarning(
+                "SaveManager not found! Progress not saved."
+            );
+            return;
+        }
+
+        SaveData data = SaveManager.Instance.Data;
+
+        int completedLevel = currentLevel.levelNumber;
+
+        // Update highest completed level
+        data.highestCompletedLevel = Mathf.Max(
+            data.highestCompletedLevel,
+            completedLevel
+        );
+
+        // Update best score
+        data.bestScore = Mathf.Max(
+            data.bestScore,
+            carrotsCollected
+        );
+
+        // Unlock the next level if it exists
+        int nextLevel = completedLevel + 1;
+
+        if (nextLevel <= levels.Length &&
+            !data.unlockedLevels.Contains(nextLevel))
+        {
+            data.unlockedLevels.Add(nextLevel);
+            data.unlockedLevels.Sort();
+
+            Debug.Log(
+                "Level " + nextLevel + " unlocked!"
+            );
+        }
+
+        // Write updated data to save.json
+        SaveManager.Instance.SaveNow();
+
+        Debug.Log("Level progress saved!");
     }
 
     void OnDestroy()

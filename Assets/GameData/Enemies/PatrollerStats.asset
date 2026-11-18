@@ -14,8 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStats
   moveSpeed: 0
   maxHealth: 0
-  damage: 0
-  detectionRange: 0
-  attackRange: 0
-  attackCooldown: 0
+  damage: 1
+  patrolSpeed: 2
+  chaseSpeed: 2.5
+  stoppingDistance: 0.1
+  chaseTargetMultiplier: 0.8
+  detectionRange: 2
+  losePlayerRange: 4
+  attackRange: 0.8
+  attackCooldown: 1.5
+  warningDuration: 0.5
+  attackHeightTolerance: 0.8
   windUpTime: 0
+  chargeSpeed: 0
+  chargeDuration: 0
+  recoveryDuration: 0
+  hitRangeX: 0
+  hitRangeY: 0
+  fieldOfView: 0
+  facingAngle: 0
+  lungeDistance: 0.25
+  lungeDuration: 0.12

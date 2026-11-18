@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd8db996359845d498c0736e6dedb5a, type: 3}
   m_Name: Level_02
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
-  levelNumber: 0
-  levelName: 
+  levelNumber: 2
+  levelName: Forest
   goal: 0
-  requiredCarrots: 0
-  timeLimit: 0
-  enemies: []
+  requiredCarrots: 3
+  timeLimit: 35
+  enemies:
+  - enemyPrefab: {fileID: 9941795114513813, guid: bc044299d163245e7adc1c69393b5bc5, type: 3}
+    spawnPosition: {x: 4, y: 1}

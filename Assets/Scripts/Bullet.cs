@@ -3,10 +3,8 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [Header("Bullet Settings")]
-    [SerializeField] private float speed = 6f;
-    [SerializeField] private float lifetime = 4f;
-    [SerializeField] private int damage = 1;
+    [Header("Bullet Data")]
+    [SerializeField] private BulletStats stats;
 
     private Vector2 direction = Vector2.right;
 
@@ -17,23 +15,46 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
-        Destroy(gameObject, lifetime);
+        if (stats == null)
+        {
+            Debug.LogError(
+                "BulletStats is missing!", this
+            );
+
+            Destroy(gameObject);
+            return;
+        }
+
+        // Destroy bullet after its lifetime
+        Destroy(gameObject, stats.lifetime);
     }
 
     void FixedUpdate()
     {
+        if (stats == null)
+            return;
+
+        // Move bullet using data asset speed
         transform.position +=
-            (Vector3)(direction * speed * Time.fixedDeltaTime);
+            (Vector3)(
+                direction *
+                stats.speed *
+                Time.fixedDeltaTime
+            );
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (stats == null)
+            return;
+
         PlayerHealth playerHealth =
             other.GetComponent<PlayerHealth>();
 
         if (playerHealth != null)
         {
-            playerHealth.TakeDamage(damage);
+            // Damage comes from BulletStats
+            playerHealth.TakeDamage(stats.damage);
 
             Debug.Log("Bullet hit the Player!");
 

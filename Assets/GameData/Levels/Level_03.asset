@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd8db996359845d498c0736e6dedb5a, type: 3}
   m_Name: Level_03
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
-  levelNumber: 0
-  levelName: 
+  levelNumber: 3
+  levelName: 'Finale '
   goal: 0
-  requiredCarrots: 0
-  timeLimit: 0
-  enemies: []
+  requiredCarrots: 3
+  timeLimit: 30
+  enemies:
+  - enemyPrefab: {fileID: 8077485211136954153, guid: 32ee54e2bbd53417698e0c8c2f2d9902, type: 3}
+    spawnPosition: {x: 7, y: -2}
+  - enemyPrefab: {fileID: 2795623620321075217, guid: 800208dbde41d47feba4182c82b9138a, type: 3}
+    spawnPosition: {x: -6, y: -0.5}
+  - enemyPrefab: {fileID: 9941795114513813, guid: bc044299d163245e7adc1c69393b5bc5, type: 3}
+    spawnPosition: {x: 4, y: 1}
