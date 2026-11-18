@@ -4,9 +4,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float jumpForce = 8f;
+    [Header("Player Data")]
+    [SerializeField] private PlayerStats stats;
 
     [Header("Ground Detection")]
     [SerializeField] private LayerMask groundLayer;
@@ -28,6 +27,12 @@ public class PlayerMovement : MonoBehaviour
         if (bunnyAnimator == null)
         {
             bunnyAnimator = GetComponentInChildren<Animator>();
+        }
+
+        if (stats == null)
+        {
+            Debug.LogError("PlayerStats is missing!", this);
+            enabled = false;
         }
     }
 
@@ -79,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Horizontal movement
         rb.linearVelocity = new Vector2(
-            moveInput * moveSpeed,
+            moveInput * stats.moveSpeed,
             rb.linearVelocity.y
         );
 
@@ -92,7 +97,7 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(
                 rb.linearVelocity.x,
-                jumpForce
+                stats.jumpForce
             );
 
             // Start jump animation immediately

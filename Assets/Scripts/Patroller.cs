@@ -11,50 +11,71 @@ public class Patroller : MonoBehaviour
         Attack
     }
 
-    [Header("Movement")]
-    [SerializeField] private float patrolSpeed = 2f;
-    [SerializeField] private float chaseSpeed = 2.5f;
-    [SerializeField] private float stoppingDistance = 0.1f;
+    [Header("Enemy Data")]
+    [SerializeField] private EnemyStats stats;
 
     [Header("Patrol Points")]
     [SerializeField] private Transform pointA;
     [SerializeField] private Transform pointB;
 
-    [Header("Player Detection")]
+    [Header("Player")]
     [SerializeField] private Transform player;
-    [SerializeField] private float detectionRange = 3f;
-    [SerializeField] private float losePlayerRange = 4f;
-
-    [Header("Attack Settings")]
-    [SerializeField] private float attackRange = 0.8f;
-    [SerializeField] private float warningDuration = 0.5f;
-    [SerializeField] private float attackCooldown = 1.5f;
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
 
-    private Transform currentTarget;
+    private Vector2 patrolA;
+    private Vector2 patrolB;
+    private bool goingToA = true;
+
     private EnemyState currentState = EnemyState.Patrol;
 
     private bool playerDetected = false;
     private bool attackInProgress = false;
     private float nextAttackTime = 0f;
 
+    // Connect Player when enemy is spawned
+    public void SetPlayer(Transform target)
+    {
+        player = target;
+    }
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        originalColor = spriteRenderer.color;
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
+
+        if (stats == null)
+        {
+            Debug.LogError("PatrollerStats is missing!", this);
+            enabled = false;
+        }
     }
 
     void Start()
     {
-        currentTarget = pointA;
+        // Save patrol positions
+        if (pointA != null && pointB != null)
+        {
+            patrolA = pointA.position;
+            patrolB = pointB.position;
+        }
     }
 
     void FixedUpdate()
     {
+        if (attackInProgress)
+        {
+            StopHorizontalMovement();
+            return;
+        }
+
         if (player == null)
         {
             currentState = EnemyState.Patrol;
@@ -66,32 +87,25 @@ public class Patroller : MonoBehaviour
             player.position.x - rb.position.x
         );
 
-        // Update player detection
+        // Player detection
         if (playerDetected)
         {
-            if (distance > losePlayerRange)
+            if (distance > stats.losePlayerRange)
             {
                 playerDetected = false;
             }
         }
-        else if (distance <= detectionRange)
+        else if (distance <= stats.detectionRange)
         {
             playerDetected = true;
         }
 
-        // Finish the current attack warning first
-        if (attackInProgress)
-        {
-            StopHorizontalMovement();
-            return;
-        }
-
-        // Choose the state
+        // Choose state
         if (!playerDetected)
         {
             currentState = EnemyState.Patrol;
         }
-        else if (distance <= attackRange)
+        else if (distance <= stats.attackRange)
         {
             currentState = EnemyState.Attack;
         }
@@ -100,7 +114,7 @@ public class Patroller : MonoBehaviour
             currentState = EnemyState.Chase;
         }
 
-        // Run the current state
+        // Run current state
         switch (currentState)
         {
             case EnemyState.Patrol:
@@ -130,27 +144,28 @@ public class Patroller : MonoBehaviour
             return;
         }
 
+        Vector2 target = goingToA ? patrolA : patrolB;
+
         float distance = Mathf.Abs(
-            currentTarget.position.x - rb.position.x
+            target.x - rb.position.x
         );
 
-        if (distance <= stoppingDistance)
+        if (distance <= stats.stoppingDistance)
         {
-            currentTarget =
-                currentTarget == pointA ? pointB : pointA;
+            goingToA = !goingToA;
+            target = goingToA ? patrolA : patrolB;
         }
 
         float direction = Mathf.Sign(
-            currentTarget.position.x - rb.position.x
+            target.x - rb.position.x
         );
 
         rb.linearVelocity = new Vector2(
-            direction * patrolSpeed,
+            direction * stats.patrolSpeed,
             rb.linearVelocity.y
         );
     }
 
-    
     void Chase()
     {
         float distance = Mathf.Abs(
@@ -162,7 +177,8 @@ public class Patroller : MonoBehaviour
         );
 
         // Move slightly inside attack range
-        float targetDistance = attackRange * 0.8f;
+        float targetDistance =
+            stats.attackRange * stats.chaseTargetMultiplier;
 
         float remainingDistance = Mathf.Max(
             0f,
@@ -170,7 +186,7 @@ public class Patroller : MonoBehaviour
         );
 
         float speed = Mathf.Min(
-            chaseSpeed,
+            stats.chaseSpeed,
             remainingDistance / Time.fixedDeltaTime
         );
 
@@ -180,7 +196,6 @@ public class Patroller : MonoBehaviour
         );
     }
 
-
     void StopHorizontalMovement()
     {
         rb.linearVelocity = new Vector2(
@@ -189,19 +204,26 @@ public class Patroller : MonoBehaviour
         );
     }
 
-    
-    
     IEnumerator AttackSequence()
     {
         attackInProgress = true;
 
-        // Yellow warning
-        spriteRenderer.color = Color.yellow;
+        // Yellow warning before attack
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.yellow;
+        }
 
-        yield return new WaitForSeconds(warningDuration);
+        yield return new WaitForSeconds(
+            stats.warningDuration
+        );
 
-        spriteRenderer.color = originalColor;
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = originalColor;
+        }
 
+        // Damage Player if still close
         if (player != null)
         {
             float horizontalDistance = Mathf.Abs(
@@ -212,23 +234,22 @@ public class Patroller : MonoBehaviour
                 player.position.y - rb.position.y
             );
 
-            // Attack only if Player is close horizontally
-            // AND at approximately the same height
-            if (horizontalDistance <= attackRange &&
-                verticalDistance <= 0.8f)
+            if (horizontalDistance <= stats.attackRange &&
+                verticalDistance <= stats.attackHeightTolerance)
             {
                 PlayerHealth playerHealth =
                     player.GetComponent<PlayerHealth>();
 
                 if (playerHealth != null)
                 {
-                    playerHealth.TakeDamage(1);
+                    playerHealth.TakeDamage(stats.damage);
+
                     Debug.Log("Patroller hit the Player!");
                 }
             }
         }
 
-        nextAttackTime = Time.time + attackCooldown;
+        nextAttackTime = Time.time + stats.attackCooldown;
         attackInProgress = false;
     }
 }

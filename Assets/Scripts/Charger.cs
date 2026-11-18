@@ -12,20 +12,15 @@ public class Charger : MonoBehaviour
         Recover
     }
 
-    [Header("Player Detection")]
+    [Header("Enemy Data")]
+    [SerializeField] private EnemyStats stats;
+
+    [Header("Player")]
     [SerializeField] private Transform player;
-    [SerializeField] private float detectionRange = 4f;
-
-    [Header("Charge Settings")]
-    [SerializeField] private float chargeSpeed = 8f;
-    [SerializeField] private float chargeDuration = 0.5f;
-    [SerializeField] private float warningDuration = 0.5f;
-    [SerializeField] private float recoveryDuration = 1.5f;
-
-    [Header("Damage Settings")]
-    [SerializeField] private int damage = 1;
-    [SerializeField] private float hitRangeX = 0.8f;
-    [SerializeField] private float hitRangeY = 0.8f;
+    public void SetPlayer(Transform target)
+    {
+        player = target;
+    }
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -40,6 +35,12 @@ public class Charger : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
+
+        if (stats == null)
+        {
+            Debug.LogError("ChargerStats is missing!", this);
+            enabled = false;
+        }
     }
 
     void Update()
@@ -52,7 +53,7 @@ public class Charger : MonoBehaviour
             player.position
         );
 
-        if (distance <= detectionRange)
+        if (distance <= stats.detectionRange)
         {
             StartCoroutine(ChargeSequence());
         }
@@ -76,15 +77,15 @@ public class Charger : MonoBehaviour
             player.position.y - transform.position.y
         );
 
-        if (distanceX <= hitRangeX &&
-            distanceY <= hitRangeY)
+        if (distanceX <= stats.hitRangeX &&
+            distanceY <= stats.hitRangeY)
         {
             PlayerHealth playerHealth =
                 player.GetComponent<PlayerHealth>();
 
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage);
+                playerHealth.TakeDamage(stats.damage);
                 hitThisCharge = true;
 
                 Debug.Log("Charger hit the Player!");
@@ -99,10 +100,23 @@ public class Charger : MonoBehaviour
 
         // Prepare: yellow warning
         currentState = EnemyState.Prepare;
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(
+            0f,
+            rb.linearVelocity.y
+        );
+
         spriteRenderer.color = Color.yellow;
 
-        yield return new WaitForSeconds(warningDuration);
+        yield return new WaitForSeconds(stats.windUpTime);
+
+        // Stop safely if the player disappeared
+        if (player == null)
+        {
+            spriteRenderer.color = originalColor;
+            currentState = EnemyState.Idle;
+            isBusy = false;
+            yield break;
+        }
 
         // Charge toward the Player
         currentState = EnemyState.Charge;
@@ -113,20 +127,23 @@ public class Charger : MonoBehaviour
         );
 
         rb.linearVelocity = new Vector2(
-            direction * chargeSpeed,
+            direction * stats.chargeSpeed,
             rb.linearVelocity.y
         );
 
-        yield return new WaitForSeconds(chargeDuration);
+        yield return new WaitForSeconds(stats.chargeDuration);
 
         // Stop
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(
+            0f,
+            rb.linearVelocity.y
+        );
 
         // Recover: gray
         currentState = EnemyState.Recover;
         spriteRenderer.color = Color.gray;
 
-        yield return new WaitForSeconds(recoveryDuration);
+        yield return new WaitForSeconds(stats.recoveryDuration);
 
         spriteRenderer.color = originalColor;
         currentState = EnemyState.Idle;

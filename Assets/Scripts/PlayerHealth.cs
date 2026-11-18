@@ -4,9 +4,8 @@ using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [Header("Health Settings")]
-    [SerializeField] private int maxHealth = 3;
-    [SerializeField] private float invulnerabilityTime = 1f;
+    [Header("Player Data")]
+    [SerializeField] private PlayerStats stats;
 
     [Header("Health UI")]
     [SerializeField] private GameObject heart1;
@@ -22,10 +21,21 @@ public class PlayerHealth : MonoBehaviour
 
     void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        originalColor = spriteRenderer.color;
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-        currentHealth = maxHealth;
+        if (stats == null)
+        {
+            Debug.LogError("PlayerStats is missing!", this);
+            enabled = false;
+            return;
+        }
+
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
+
+        currentHealth = stats.maxHealth;
     }
 
     void Start()
@@ -35,7 +45,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (isInvulnerable || isDead)
+        if (isInvulnerable || isDead || !enabled)
             return;
 
         currentHealth = Mathf.Max(
@@ -73,14 +83,29 @@ public class PlayerHealth : MonoBehaviour
     {
         isInvulnerable = true;
 
-        spriteRenderer.color = Color.red;
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.red;
+        }
 
-        yield return new WaitForSeconds(0.2f);
+        float flashDuration = Mathf.Clamp(
+            stats.damageFlashDuration,
+            0f,
+            stats.invulnerabilityDuration
+        );
 
-        spriteRenderer.color = originalColor;
+        yield return new WaitForSeconds(flashDuration);
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = originalColor;
+        }
 
         yield return new WaitForSeconds(
-            Mathf.Max(0f, invulnerabilityTime - 0.2f)
+            Mathf.Max(
+                0f,
+                stats.invulnerabilityDuration - flashDuration
+            )
         );
 
         isInvulnerable = false;
@@ -92,7 +117,10 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log("Player died!");
 
-        spriteRenderer.color = Color.gray;
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.gray;
+        }
 
         // Disable movement when Player dies
         PlayerMovement movement =

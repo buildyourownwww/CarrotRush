@@ -11,16 +11,12 @@ public class Shooter : MonoBehaviour
         Shoot
     }
 
+    [Header("Enemy Data")]
+    [SerializeField] private EnemyStats stats;
+
     [Header("Player Detection")]
     [SerializeField] private Transform player;
-    [SerializeField] private float detectionRange = 6f;
-    [SerializeField] private float fieldOfView = 120f;
-    [SerializeField] private float facingAngle = 225f;
     [SerializeField] private LayerMask wallLayer;
-
-    [Header("Attack Settings")]
-    [SerializeField] private float warningDuration = 0.5f;
-    [SerializeField] private float attackCooldown = 2f;
 
     [Header("Bullet Settings")]
     [SerializeField] private Bullet bulletPrefab;
@@ -33,10 +29,21 @@ public class Shooter : MonoBehaviour
     private bool isAttacking = false;
     private float nextAttackTime = 0f;
 
+    public void SetPlayer(Transform target)
+    {
+        player = target;
+    }
+
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
+
+        if (stats == null)
+        {
+            Debug.LogError("ShooterStats is missing!", this);
+            enabled = false;
+        }
     }
 
     // Check distance, viewing angle, and walls
@@ -45,21 +52,21 @@ public class Shooter : MonoBehaviour
         if (player == null || firePoint == null)
             return false;
 
-            // Check whether Shooter is visible on screen
-            Camera cam = Camera.main;
+        // Check whether Shooter is visible on screen
+        Camera cam = Camera.main;
 
-            if (cam != null)
+        if (cam != null)
+        {
+            Vector3 screenPos =
+                cam.WorldToViewportPoint(transform.position);
+
+            if (screenPos.z <= 0f ||
+                screenPos.x < 0f || screenPos.x > 1f ||
+                screenPos.y < 0f || screenPos.y > 1f)
             {
-                Vector3 screenPos =
-                    cam.WorldToViewportPoint(transform.position);
-
-                if (screenPos.z <= 0f ||
-                    screenPos.x < 0f || screenPos.x > 1f ||
-                    screenPos.y < 0f || screenPos.y > 1f)
-                {
-                    return false;
-                }
+                return false;
             }
+        }
 
         Vector2 start = firePoint.position;
         Vector2 target = player.position;
@@ -68,13 +75,13 @@ public class Shooter : MonoBehaviour
         float distance = direction.magnitude;
 
         // 1. Distance check
-        if (distance > detectionRange)
+        if (distance > stats.detectionRange)
             return false;
 
-        // 2. Field of View angle check
+        // 2. Field of View check
         Vector2 facingDirection = new Vector2(
-            Mathf.Cos(facingAngle * Mathf.Deg2Rad),
-            Mathf.Sin(facingAngle * Mathf.Deg2Rad)
+            Mathf.Cos(stats.facingAngle * Mathf.Deg2Rad),
+            Mathf.Sin(stats.facingAngle * Mathf.Deg2Rad)
         );
 
         float angleToPlayer = Vector2.Angle(
@@ -82,7 +89,7 @@ public class Shooter : MonoBehaviour
             direction
         );
 
-        if (angleToPlayer > fieldOfView / 2f)
+        if (angleToPlayer > stats.fieldOfView / 2f)
             return false;
 
         // 3. Wall raycast check
@@ -118,10 +125,10 @@ public class Shooter : MonoBehaviour
         isAttacking = true;
         currentState = EnemyState.Aim;
 
-        // Yellow warning before shooting
+        // Yellow warning
         spriteRenderer.color = Color.yellow;
 
-        yield return new WaitForSeconds(warningDuration);
+        yield return new WaitForSeconds(stats.warningDuration);
 
         spriteRenderer.color = originalColor;
         currentState = EnemyState.Shoot;
@@ -144,24 +151,27 @@ public class Shooter : MonoBehaviour
             Debug.Log("Shooter fired a bullet!");
         }
 
-        nextAttackTime = Time.time + attackCooldown;
+        nextAttackTime = Time.time + stats.attackCooldown;
         isAttacking = false;
         currentState = EnemyState.Idle;
     }
 
-    // Show the viewing direction in Scene view
+    // Show viewing direction in Scene view
     void OnDrawGizmosSelected()
     {
+        if (stats == null)
+            return;
+
         Vector2 facingDirection = new Vector2(
-            Mathf.Cos(facingAngle * Mathf.Deg2Rad),
-            Mathf.Sin(facingAngle * Mathf.Deg2Rad)
+            Mathf.Cos(stats.facingAngle * Mathf.Deg2Rad),
+            Mathf.Sin(stats.facingAngle * Mathf.Deg2Rad)
         );
 
         Gizmos.color = Color.yellow;
 
         Gizmos.DrawRay(
             transform.position,
-            facingDirection * detectionRange
+            facingDirection * stats.detectionRange
         );
     }
 }

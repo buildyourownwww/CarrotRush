@@ -3,49 +3,57 @@ using UnityEngine;
 
 public class CarrotCollector : MonoBehaviour
 {
-    [Header("Carrot Settings")]
-    [SerializeField] private int pointsPerCarrot = 1;
+    [Header("Item Data")]
+    [SerializeField] private ItemStats carrotData;
 
     [Header("UI")]
     [SerializeField] private HUD hud;
+
+    [Header("Level System")]
+    [SerializeField] private LevelFlow levelFlow;
 
     private int carrotCount = 0;
 
     void Start()
     {
-        // Find the existing HUD
-        if (hud == null)
+        if (carrotData == null)
         {
-            hud = FindFirstObjectByType<HUD>();
+            Debug.LogError("CarrotData is missing!", this);
+            enabled = false;
+            return;
         }
 
-        // Start the counter at zero
+        if (hud == null)
+            hud = FindFirstObjectByType<HUD>();
+
+        if (levelFlow == null)
+            levelFlow = FindFirstObjectByType<LevelFlow>();
+
         if (hud != null)
-        {
             hud.SetCarrots(carrotCount);
-        }
         else
-        {
             Debug.LogError("HUD not found!");
-        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // Only collect objects tagged Carrot
         if (!other.CompareTag("Carrot"))
             return;
 
-        if (hud == null)
+        if (hud == null || carrotData == null)
             return;
 
-        // Add points
-        carrotCount += pointsPerCarrot;
+        // Add points from ItemStats
+        carrotCount += carrotData.points;
 
-        // Update the existing counter immediately
+        // Update HUD
         hud.SetCarrots(carrotCount);
 
-        // Remove the collected carrot
+        // Tell LevelFlow one carrot was collected
+        if (levelFlow != null)
+            levelFlow.RegisterCarrotCollected();
+
+        // Remove carrot
         Destroy(other.gameObject);
     }
 }
