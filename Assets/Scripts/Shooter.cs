@@ -22,6 +22,10 @@ public class Shooter : MonoBehaviour
     [SerializeField] private Bullet bulletPrefab;
     [SerializeField] private Transform firePoint;
 
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip shootingSound;
+
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
 
@@ -39,6 +43,9 @@ public class Shooter : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
 
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
         if (stats == null)
         {
             Debug.LogError("ShooterStats is missing!", this);
@@ -46,13 +53,11 @@ public class Shooter : MonoBehaviour
         }
     }
 
-    // Check distance, viewing angle, and walls
     bool CanSeePlayer()
     {
         if (player == null || firePoint == null)
             return false;
 
-        // Check whether Shooter is visible on screen
         Camera cam = Camera.main;
 
         if (cam != null)
@@ -74,11 +79,9 @@ public class Shooter : MonoBehaviour
         Vector2 direction = target - start;
         float distance = direction.magnitude;
 
-        // 1. Distance check
         if (distance > stats.detectionRange)
             return false;
 
-        // 2. Field of View check
         Vector2 facingDirection = new Vector2(
             Mathf.Cos(stats.facingAngle * Mathf.Deg2Rad),
             Mathf.Sin(stats.facingAngle * Mathf.Deg2Rad)
@@ -92,7 +95,6 @@ public class Shooter : MonoBehaviour
         if (angleToPlayer > stats.fieldOfView / 2f)
             return false;
 
-        // 3. Wall raycast check
         RaycastHit2D hit = Physics2D.Raycast(
             start,
             direction.normalized,
@@ -125,7 +127,6 @@ public class Shooter : MonoBehaviour
         isAttacking = true;
         currentState = EnemyState.Aim;
 
-        // Yellow warning
         spriteRenderer.color = Color.yellow;
 
         yield return new WaitForSeconds(stats.warningDuration);
@@ -133,7 +134,6 @@ public class Shooter : MonoBehaviour
         spriteRenderer.color = originalColor;
         currentState = EnemyState.Shoot;
 
-        // Check again before firing
         if (CanSeePlayer() && bulletPrefab != null)
         {
             Vector2 direction = (
@@ -148,6 +148,12 @@ public class Shooter : MonoBehaviour
 
             bullet.SetDirection(direction);
 
+            // Play shooting sound
+            if (audioSource != null && shootingSound != null)
+            {
+                audioSource.PlayOneShot(shootingSound);
+            }
+
             Debug.Log("Shooter fired a bullet!");
         }
 
@@ -156,7 +162,6 @@ public class Shooter : MonoBehaviour
         currentState = EnemyState.Idle;
     }
 
-    // Show viewing direction in Scene view
     void OnDrawGizmosSelected()
     {
         if (stats == null)
@@ -175,3 +180,4 @@ public class Shooter : MonoBehaviour
         );
     }
 }
+    

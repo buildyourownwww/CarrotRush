@@ -12,7 +12,7 @@ public class AudioSettings : MonoBehaviour
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
 
-    private const string MusicParameter = "MusicVolume";
+    private const string MusicParameter = "MusicSliderVolume";
     private const string SFXParameter = "SFXVolume";
 
     void Start()

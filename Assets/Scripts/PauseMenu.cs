@@ -7,16 +7,16 @@ using UnityEngine.Audio;
 public class PauseMenu : MonoBehaviour
 {
     [Header("Pause UI")]
-    [SerializeField] GameObject pausePanel;
-    [SerializeField] GameObject controls;
+    [SerializeField] private GameObject pausePanel;
+    [SerializeField] private GameObject controls;
 
     [Header("Scenes")]
-    [SerializeField] string menuScene = "MainMenu";
+    [SerializeField] private string menuScene = "MainMenu";
 
     [Header("Audio")]
-    [SerializeField] AudioMixerSnapshot normalSnapshot;
-    [SerializeField] AudioMixerSnapshot pausedSnapshot;
-    [SerializeField] float transitionTime = 0.2f;
+    [SerializeField] private AudioMixerSnapshot normalSnapshot;
+    [SerializeField] private AudioMixerSnapshot pausedSnapshot;
+    [SerializeField] private float transitionTime = 0.2f;
 
     public static bool IsPaused { get; private set; }
 
@@ -49,16 +49,26 @@ public class PauseMenu : MonoBehaviour
         if (paused)
         {
             if (pausedSnapshot == null)
+            {
                 Debug.LogError("PAUSED SNAPSHOT IS MISSING on " + gameObject.name);
+            }
             else
+            {
+                Debug.Log("PAUSED SNAPSHOT ACTIVATED!");
                 pausedSnapshot.TransitionTo(transitionTime);
+            }
         }
         else
         {
             if (normalSnapshot == null)
+            {
                 Debug.LogError("NORMAL SNAPSHOT IS MISSING on " + gameObject.name);
+            }
             else
+            {
+                Debug.Log("NORMAL SNAPSHOT ACTIVATED!");
                 normalSnapshot.TransitionTo(transitionTime);
+            }
         }
     }
 
@@ -80,6 +90,7 @@ public class PauseMenu : MonoBehaviour
 
         Time.timeScale = 1f;
         IsPaused = false;
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -89,6 +100,7 @@ public class PauseMenu : MonoBehaviour
 
         Time.timeScale = 1f;
         IsPaused = false;
+
         SceneManager.LoadScene(menuScene);
     }
 

@@ -1,5 +1,19 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!244 &-6895829721283000747
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 4b8edb0efe9c84d99b7d65ea535968f0
+  m_EffectName: Attenuation
+  m_MixLevel: ffad9b71225094cbb93b9ee9a2859fff
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!243 &-6201099854668892076
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -9,7 +23,8 @@ AudioMixerGroupController:
   m_Name: Music
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 0578dbe07e5d14859acb7cd0f95bb3a6
-  m_Children: []
+  m_Children:
+  - {fileID: 7489227350604150724}
   m_Volume: aac4b23de0d8746178238cbe539ac45c
   m_Pitch: 9cabb020a60d44c1a92a653b767361a8
   m_Send: 00000000000000000000000000000000
@@ -73,6 +88,8 @@ AudioMixerController:
   m_ExposedParameters:
   - guid: aac4b23de0d8746178238cbe539ac45c
     name: MusicVolume
+  - guid: 029ffe284b91f4f13bc1539a8fc307a0
+    name: MusicSliderVolume
   - guid: 26c7704ba09a64671b0b8b13da2020cb
     name: SFXVolume
   m_AudioMixerGroupViews:
@@ -80,9 +97,10 @@ AudioMixerController:
     - ef6c4630dcbb04812aa0a5cc48e0f321
     - 0578dbe07e5d14859acb7cd0f95bb3a6
     - 1c97cb3ead45c4128a7ec2fb7ec152a5
+    - 4e2923ffc471c40f19c374dcc63c31fc
     name: View
   m_CurrentViewIndex: 0
-  m_TargetSnapshot: {fileID: 8841977017387164394}
+  m_TargetSnapshot: {fileID: 298016590307464108}
 --- !u!243 &24300002
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -140,7 +158,7 @@ AudioMixerSnapshotController:
   m_SnapshotID: b50e356603ec44b5687633c6ecd2aee3
   m_FloatValues:
     4c47c2d021b81447db0b2624d0c0d84a: 800
-    aac4b23de0d8746178238cbe539ac45c: -15
+    aac4b23de0d8746178238cbe539ac45c: -15.000001
   m_TransitionOverrides: {}
 --- !u!244 &1139562891517786687
 AudioMixerEffectController:
@@ -174,6 +192,25 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!243 &7489227350604150724
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MusicVolumeControl
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 4e2923ffc471c40f19c374dcc63c31fc
+  m_Children: []
+  m_Volume: 029ffe284b91f4f13bc1539a8fc307a0
+  m_Pitch: 56d8a6a936ecc4b138857c463c95573e
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -6895829721283000747}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!245 &8841977017387164394
 AudioMixerSnapshotController:
   m_ObjectHideFlags: 0

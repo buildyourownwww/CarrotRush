@@ -191,6 +191,8 @@ MonoBehaviour:
     m_Bits: 256
   bulletPrefab: {fileID: 556643144247968688, guid: 038dec1a8308b4646a3b4a2197c174dc, type: 3}
   firePoint: {fileID: 4213836465799798345}
+  audioSource: {fileID: -3528689845082703968}
+  shootingSound: {fileID: 8300000, guid: 4aee1348de31742b4bf9b249eb929996, type: 3}
 --- !u!114 &2408498012109558880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +219,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -4763207133483302807, guid: 8f3519da796504b29b35f5feb3d0acb9, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
