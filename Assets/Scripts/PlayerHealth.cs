@@ -12,6 +12,10 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private GameObject heart2;
     [SerializeField] private GameObject heart3;
 
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip hitSound;
+
     private int currentHealth;
     private bool isInvulnerable = false;
     private bool isDead = false;
@@ -22,6 +26,11 @@ public class PlayerHealth : MonoBehaviour
     void Awake()
     {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
 
         if (stats == null)
         {
@@ -47,6 +56,12 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isInvulnerable || isDead || !enabled)
             return;
+
+        // Play hit sound
+        if (audioSource != null && hitSound != null)
+        {
+            audioSource.PlayOneShot(hitSound);
+        }
 
         currentHealth = Mathf.Max(
             0,
@@ -122,7 +137,6 @@ public class PlayerHealth : MonoBehaviour
             spriteRenderer.color = Color.gray;
         }
 
-        // Disable movement when Player dies
         PlayerMovement movement =
             GetComponent<PlayerMovement>();
 

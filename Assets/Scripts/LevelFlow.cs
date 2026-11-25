@@ -27,7 +27,6 @@ public class LevelFlow : MonoBehaviour
     private int carrotsCollected;
     private bool levelFinished;
 
-    
     void Start()
     {
         // Read the level selected in the menu
@@ -45,8 +44,13 @@ public class LevelFlow : MonoBehaviour
         }
 
         LoadLevel(selectedLevel);
-    }
 
+        // Switch from menu music to level music
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.PlayLevelMusic();
+        }
+    }
 
     void Update()
     {
@@ -104,9 +108,7 @@ public class LevelFlow : MonoBehaviour
 
         UpdateTimerUI();
 
-        Debug.Log(
-            "Loaded level: " + currentLevel.levelName
-        );
+        Debug.Log("Loaded level: " + currentLevel.levelName);
 
         // Spawn enemies from LevelData
         if (currentLevel.enemies == null)
@@ -239,9 +241,7 @@ public class LevelFlow : MonoBehaviour
             data.unlockedLevels.Add(nextLevel);
             data.unlockedLevels.Sort();
 
-            Debug.Log(
-                "Level " + nextLevel + " unlocked!"
-            );
+            Debug.Log("Level " + nextLevel + " unlocked!");
         }
 
         // Write updated data to save.json

@@ -17,6 +17,11 @@ public class Charger : MonoBehaviour
 
     [Header("Player")]
     [SerializeField] private Transform player;
+
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip windUpSound;
+
     public void SetPlayer(Transform target)
     {
         player = target;
@@ -34,7 +39,13 @@ public class Charger : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
         originalColor = spriteRenderer.color;
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
 
         if (stats == null)
         {
@@ -100,12 +111,20 @@ public class Charger : MonoBehaviour
 
         // Prepare: yellow warning
         currentState = EnemyState.Prepare;
+
         rb.linearVelocity = new Vector2(
             0f,
             rb.linearVelocity.y
         );
 
         spriteRenderer.color = Color.yellow;
+
+        // Play warning sound
+        if (audioSource != null && windUpSound != null)
+        {
+            audioSource.PlayOneShot(windUpSound);
+            StartCoroutine(StopWindUpSound());
+        }
 
         yield return new WaitForSeconds(stats.windUpTime);
 
@@ -148,5 +167,15 @@ public class Charger : MonoBehaviour
         spriteRenderer.color = originalColor;
         currentState = EnemyState.Idle;
         isBusy = false;
+    }
+
+    IEnumerator StopWindUpSound()
+    {
+        yield return new WaitForSeconds(1.2f);
+
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
     }
 }

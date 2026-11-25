@@ -12,6 +12,10 @@ public class CarrotCollector : MonoBehaviour
     [Header("Level System")]
     [SerializeField] private LevelFlow levelFlow;
 
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip pickupSound;
+
     private int carrotCount = 0;
 
     void Start()
@@ -42,6 +46,12 @@ public class CarrotCollector : MonoBehaviour
 
         if (hud == null || carrotData == null)
             return;
+
+        // Play pickup sound
+        if (audioSource != null && pickupSound != null)
+        {
+            audioSource.PlayOneShot(pickupSound);
+        }
 
         // Add points from ItemStats
         carrotCount += carrotData.points;

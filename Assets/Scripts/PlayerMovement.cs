@@ -13,6 +13,10 @@ public class PlayerMovement : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator bunnyAnimator;
 
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip jumpSound;
+
     private Rigidbody2D rb;
     private Collider2D playerCollider;
     private float moveInput;
@@ -23,10 +27,14 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<Collider2D>();
 
-        // Find Animator on BunnyVisual
         if (bunnyAnimator == null)
         {
             bunnyAnimator = GetComponentInChildren<Animator>();
+        }
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
         }
 
         if (stats == null)
@@ -99,6 +107,12 @@ public class PlayerMovement : MonoBehaviour
                 rb.linearVelocity.x,
                 stats.jumpForce
             );
+
+            // Play jump sound
+            if (audioSource != null && jumpSound != null)
+            {
+                audioSource.PlayOneShot(jumpSound);
+            }
 
             // Start jump animation immediately
             isGrounded = false;
