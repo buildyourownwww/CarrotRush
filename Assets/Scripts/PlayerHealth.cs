@@ -14,7 +14,9 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Sound Effects")]
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioSource hitAudioSource;
     [SerializeField] private AudioClip hitSound;
+    [SerializeField] private AudioClip deathSound;
 
     private int currentHealth;
     private bool isInvulnerable = false;
@@ -57,10 +59,12 @@ public class PlayerHealth : MonoBehaviour
         if (isInvulnerable || isDead || !enabled)
             return;
 
-        // Play hit sound
-        if (audioSource != null && hitSound != null)
+        // Play hit sound with random pitch
+        if (hitAudioSource != null && hitSound != null)
         {
-            audioSource.PlayOneShot(hitSound);
+            hitAudioSource.pitch = Random.Range(0.65f, 1.35f);
+            Debug.Log("Hit sound pitch: " + hitAudioSource.pitch);
+            hitAudioSource.PlayOneShot(hitSound);
         }
 
         currentHealth = Mathf.Max(
@@ -132,17 +136,32 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log("Player died!");
 
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
+
         if (spriteRenderer != null)
         {
             spriteRenderer.color = Color.gray;
         }
 
-        PlayerMovement movement =
-            GetComponent<PlayerMovement>();
+        PlayerMovement movement = GetComponent<PlayerMovement>();
 
         if (movement != null)
         {
             movement.enabled = false;
+        }
+
+        LevelFlow levelFlow = FindFirstObjectByType<LevelFlow>();
+
+        if (levelFlow != null)
+        {
+            levelFlow.FinishLevel(
+                false,
+                true,
+                deathSound != null ? deathSound.length : 0f
+            );
         }
     }
 }

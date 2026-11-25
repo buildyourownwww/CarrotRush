@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
@@ -18,6 +19,11 @@ public class LevelFlow : MonoBehaviour
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private TMP_Text resultText;
 
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip winSound;
+    [SerializeField] private AudioClip loseSound;
+
     private LevelData currentLevel;
 
     private List<GameObject> spawnedEnemies =
@@ -29,15 +35,12 @@ public class LevelFlow : MonoBehaviour
 
     void Start()
     {
-        // Read the level selected in the menu
         int selectedLevel = LevelSelectMenu.SelectedLevelToLoad;
 
         Debug.Log("LevelFlow received level: " + selectedLevel);
 
-        // Reset the selection for future scene loads
         LevelSelectMenu.SelectedLevelToLoad = 0;
 
-        // If no level was selected, use the default
         if (selectedLevel <= 0)
         {
             selectedLevel = startingLevel;
@@ -45,7 +48,6 @@ public class LevelFlow : MonoBehaviour
 
         LoadLevel(selectedLevel);
 
-        // Switch from menu music to level music
         if (MusicManager.Instance != null)
         {
             MusicManager.Instance.PlayLevelMusic();
@@ -86,7 +88,6 @@ public class LevelFlow : MonoBehaviour
             return;
         }
 
-        // Remove previous enemies
         foreach (GameObject enemy in spawnedEnemies)
         {
             if (enemy != null)
@@ -97,7 +98,6 @@ public class LevelFlow : MonoBehaviour
 
         currentLevel = selectedLevel;
 
-        // Reset level progress
         timeRemaining = currentLevel.timeLimit;
         carrotsCollected = 0;
         levelFinished = false;
@@ -110,7 +110,6 @@ public class LevelFlow : MonoBehaviour
 
         Debug.Log("Loaded level: " + currentLevel.levelName);
 
-        // Spawn enemies from LevelData
         if (currentLevel.enemies == null)
             return;
 
@@ -128,20 +127,17 @@ public class LevelFlow : MonoBehaviour
 
             spawnedEnemies.Add(enemy);
 
-            Charger charger =
-                enemy.GetComponent<Charger>();
+            Charger charger = enemy.GetComponent<Charger>();
 
             if (charger != null)
                 charger.SetPlayer(player);
 
-            Patroller patroller =
-                enemy.GetComponent<Patroller>();
+            Patroller patroller = enemy.GetComponent<Patroller>();
 
             if (patroller != null)
                 patroller.SetPlayer(player);
 
-            Shooter shooter =
-                enemy.GetComponent<Shooter>();
+            Shooter shooter = enemy.GetComponent<Shooter>();
 
             if (shooter != null)
                 shooter.SetPlayer(player);
@@ -176,12 +172,21 @@ public class LevelFlow : MonoBehaviour
         }
     }
 
-    void FinishLevel(bool won)
+    public void FinishLevel(
+        bool won,
+        bool playerDied = false,
+        float deathSoundDuration = 0f)
     {
         if (levelFinished)
             return;
 
         levelFinished = true;
+
+        // Stop background music
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.StopMusic();
+        }
 
         if (won)
         {
@@ -190,19 +195,41 @@ public class LevelFlow : MonoBehaviour
             if (resultText != null)
                 resultText.text = "LEVEL COMPLETE!";
 
-            // Save completed level progress
+            if (audioSource != null && winSound != null)
+            {
+                audioSource.PlayOneShot(winSound);
+            }
+
             SaveLevelProgress();
         }
         else
         {
-            Debug.Log("TIME'S UP!");
+            Debug.Log("LEVEL LOST!");
 
             if (resultText != null)
-                resultText.text = "TIME'S UP!";
+            {
+                resultText.text = playerDied
+                    ? "YOU DIED!"
+                    : "TIME'S UP!";
+            }
+
+            // Play Lose sound after Death sound finishes
+            StartCoroutine(
+                PlayLoseSoundAfterDelay(deathSoundDuration)
+            );
         }
 
-        // Pause gameplay
         Time.timeScale = 0f;
+    }
+
+    IEnumerator PlayLoseSoundAfterDelay(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+
+        if (audioSource != null && loseSound != null)
+        {
+            audioSource.PlayOneShot(loseSound);
+        }
     }
 
     void SaveLevelProgress()
@@ -220,19 +247,16 @@ public class LevelFlow : MonoBehaviour
 
         int completedLevel = currentLevel.levelNumber;
 
-        // Update highest completed level
         data.highestCompletedLevel = Mathf.Max(
             data.highestCompletedLevel,
             completedLevel
         );
 
-        // Update best score
         data.bestScore = Mathf.Max(
             data.bestScore,
             carrotsCollected
         );
 
-        // Unlock the next level if it exists
         int nextLevel = completedLevel + 1;
 
         if (nextLevel <= levels.Length &&
@@ -244,7 +268,6 @@ public class LevelFlow : MonoBehaviour
             Debug.Log("Level " + nextLevel + " unlocked!");
         }
 
-        // Write updated data to save.json
         SaveManager.Instance.SaveNow();
 
         Debug.Log("Level progress saved!");

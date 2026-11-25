@@ -64,16 +64,20 @@ public class PauseMenu : MonoBehaviour
 
     public void Pause()
     {
+        PlayClickSound();
         SetPaused(true);
     }
 
     public void Resume()
     {
+        PlayClickSound();
         SetPaused(false);
     }
 
     public void Restart()
     {
+        PlayClickSound();
+
         Time.timeScale = 1f;
         IsPaused = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -81,9 +85,19 @@ public class PauseMenu : MonoBehaviour
 
     public void ToMenu()
     {
+        PlayClickSound();
+
         Time.timeScale = 1f;
         IsPaused = false;
         SceneManager.LoadScene(menuScene);
+    }
+
+    void PlayClickSound()
+    {
+        if (UIAudioManager.Instance != null)
+        {
+            UIAudioManager.Instance.PlayClick();
+        }
     }
 
     void OnApplicationPause(bool appPaused)

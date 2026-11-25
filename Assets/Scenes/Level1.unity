@@ -4057,6 +4057,9 @@ MonoBehaviour:
   player: {fileID: 2132851937}
   timerText: {fileID: 1051209449}
   resultText: {fileID: 1226721240}
+  audioSource: {fileID: 2132851941}
+  winSound: {fileID: 8300000, guid: 7cdcdd1749cab48ee9dff053f7d5db84, type: 3}
+  loseSound: {fileID: 8300000, guid: dd42fb44da8144356a8b9c5c029ce855, type: 3}
 --- !u!4 &861421757
 Transform:
   m_ObjectHideFlags: 0
@@ -11645,6 +11648,7 @@ GameObject:
   - component: {fileID: 2132851939}
   - component: {fileID: 2132851940}
   - component: {fileID: 2132851941}
+  - component: {fileID: 2132851942}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -11837,7 +11841,9 @@ MonoBehaviour:
   heart2: {fileID: 1121167267}
   heart3: {fileID: 2016158921}
   audioSource: {fileID: 2132851941}
+  hitAudioSource: {fileID: 2132851942}
   hitSound: {fileID: 8300000, guid: c3854eaeedae4411bbffde8bc2068d41, type: 3}
+  deathSound: {fileID: 8300000, guid: aa4d5adcbfcde4a759b0497d42fc85f1, type: 3}
 --- !u!114 &2132851940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11868,6 +11874,103 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &2132851942
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2132851933}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -4763207133483302807, guid: 8f3519da796504b29b35f5feb3d0acb9, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -12294,12 +12397,28 @@ PrefabInstance:
       value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 4087374853748888233, guid: 4c7856b7de6234858affb846935c1760, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087374853748888233, guid: 4c7856b7de6234858affb846935c1760, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087374853748888233, guid: 4c7856b7de6234858affb846935c1760, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2104759361}
     - target: {fileID: 4087374853748888233, guid: 4c7856b7de6234858affb846935c1760, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087374853748888233, guid: 4c7856b7de6234858affb846935c1760, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Pause
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087374853748888233, guid: 4c7856b7de6234858affb846935c1760, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PauseMenu, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 4660506824042768012, guid: 4c7856b7de6234858affb846935c1760, type: 3}
       propertyPath: m_AnchoredPosition.x

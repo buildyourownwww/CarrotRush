@@ -49,9 +49,25 @@ public class MusicManager : MonoBehaviour
         CrossfadeTo(levelMusic);
     }
 
+    public void StopMusic()
+    {
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+            fadeCoroutine = null;
+        }
+
+        musicSourceA.Stop();
+        musicSourceB.Stop();
+
+        musicSourceA.volume = 1f;
+        musicSourceB.volume = 1f;
+    }
+
     private void CrossfadeTo(AudioClip newClip)
     {
-        if (newClip == null || activeSource.clip == newClip && activeSource.isPlaying)
+        if (newClip == null ||
+            (activeSource.clip == newClip && activeSource.isPlaying))
             return;
 
         if (fadeCoroutine != null)

@@ -41,16 +41,24 @@ public class CarrotCollector : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("TRIGGER DETECTED!");
         if (!other.CompareTag("Carrot"))
             return;
 
         if (hud == null || carrotData == null)
             return;
 
-        // Play pickup sound
+        // Play pickup sound with noticeable random pitch variation
         if (audioSource != null && pickupSound != null)
         {
+            float randomPitch = Random.Range(0.65f, 1.35f);
+
+            audioSource.pitch = randomPitch;
             audioSource.PlayOneShot(pickupSound);
+
+            Debug.Log("Carrot pickup pitch: " + randomPitch);
+
+            audioSource.pitch = 1f;
         }
 
         // Add points from ItemStats

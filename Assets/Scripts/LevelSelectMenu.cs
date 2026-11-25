@@ -59,6 +59,8 @@ public class LevelSelectMenu : MonoBehaviour
         if (menuPanel == null)
             return;
 
+        PlayClickSound();
+
         previousTimeScale = Time.timeScale;
 
         RefreshButtons();
@@ -70,6 +72,8 @@ public class LevelSelectMenu : MonoBehaviour
     public void CloseMenu()
     {
         Debug.Log("BACK BUTTON CLICKED!");
+
+        PlayClickSound();
 
         if (menuPanel != null)
         {
@@ -124,6 +128,8 @@ public class LevelSelectMenu : MonoBehaviour
         if (isLoading || !IsUnlocked(levelNumber))
             return;
 
+        PlayClickSound();
+
         isLoading = true;
 
         SelectedLevelToLoad = levelNumber;
@@ -142,5 +148,13 @@ public class LevelSelectMenu : MonoBehaviour
         SceneManager.LoadScene(
             SceneManager.GetActiveScene().name
         );
+    }
+
+    void PlayClickSound()
+    {
+        if (UIAudioManager.Instance != null)
+        {
+            UIAudioManager.Instance.PlayClick();
+        }
     }
 }

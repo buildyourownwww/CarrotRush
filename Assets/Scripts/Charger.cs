@@ -119,9 +119,13 @@ public class Charger : MonoBehaviour
 
         spriteRenderer.color = Color.yellow;
 
-        // Play warning sound
+        // Play warning sound with random pitch
         if (audioSource != null && windUpSound != null)
         {
+            audioSource.pitch = Random.Range(0.8f, 1.2f);
+
+            Debug.Log("Charger wind-up pitch: " + audioSource.pitch);
+
             audioSource.PlayOneShot(windUpSound);
             StartCoroutine(StopWindUpSound());
         }
