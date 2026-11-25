@@ -16,7 +16,6 @@ public class MainMenu : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        // Play the UI click sound
         UIAudioManager audioManager = FindFirstObjectByType<UIAudioManager>();
 
         if (audioManager != null)
@@ -24,7 +23,6 @@ public class MainMenu : MonoBehaviour
             audioManager.PlayClick();
         }
 
-        // Wait for the sound to start playing
         yield return new WaitForSecondsRealtime(0.2f);
 
         SceneManager.LoadScene(firstLevel);
@@ -32,6 +30,18 @@ public class MainMenu : MonoBehaviour
 
     public void Quit()
     {
+        StartCoroutine(QuitAndClose());
+    }
+
+    IEnumerator QuitAndClose()
+    {
+        if (UIAudioManager.Instance != null)
+        {
+            UIAudioManager.Instance.PlayClick();
+        }
+
+        yield return new WaitForSecondsRealtime(0.2f);
+
         Debug.Log("Quit pressed");
 
         #if UNITY_EDITOR
